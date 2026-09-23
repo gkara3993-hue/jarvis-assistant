@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Ses komutu dinleme -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <!-- API çağrıları (vision / LLM) için internet -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- Arka plan servisi -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- Cihaz kontrolü: Wi-Fi / Bluetooth -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+
+    <!-- Fener / Kamera (kullanıcı tetiklediğinde "ne görüyorsun" özelliği için) -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.FLASHLIGHT" />
+
+    <!-- Ses seviyesi kontrolü -->
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+
+    <!-- Ekran parlaklığı için sistem ayarlarını değiştirme (kullanıcı onayı gerektirir) -->
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+
+    <!--
+        NOT: "Telefonu Bul" özelliği yalnızca kullanıcı bunu ayarlardan AÇIKÇA etkinleştirdiğinde
+        ve kendi hesabıyla web panelinden giriş yaptığında çalışır. Konum yalnızca cihaz
+        SAHİBİNE gösterilir, gizli üçüncü bir alıcıya otomatik gönderim YAPILMAZ.
+    -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <!-- Cihaz yeniden başladığında servisi tekrar başlatmak için -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/Theme.JarvisAssistant"
+        android:usesCleartextTraffic="false">
+
+        <activity
+            android:name=".ui.MainActivity"
+            android:exported="true"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Ayarlar ekranı: her özelliği tek tek açıp kapatma -->
+        <activity
+            android:name=".ui.SettingsActivity"
+            android:exported="false"
+            android:label="Jarvis Ayarları" />
+
+        <!-- Ana arka plan servisi: uyanma kelimesi dinleme + komut işleme -->
+        <service
+            android:name=".service.JarvisForegroundService"
+            android:foregroundServiceType="microphone"
+            android:exported="false" />
+
+        <!--
+            Erişilebilirlik servisi: YALNIZCA kullanıcının sesli olarak verdiği komutu
+            (ör. "WhatsApp'ı aç ve Ahmet'e 'yoldayım' yaz") uygulamak için kullanılır.
+            Ekranı sürekli/gizlice okumaz; sadece komut yürütme sırasında etkindir ve
+            her etkinleşmede bildirim çubuğunda görünür bir simge gösterir.
+        -->
+        <service
+            android:name=".accessibility.CommandExecutionService"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/accessibility_service_config" />
+        </service>
+
+        <receiver
+            android:name=".service.BootReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+    </application>
+</manifest>

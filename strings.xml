@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Jarvis</string>
+    <string name="accessibility_service_description">
+        Jarvis, yalnızca senin sesli komut verdiğin anda (ör. "WhatsApp\'ı aç ve mesaj yaz")
+        ekranda o komutu uygulamak için bu izni kullanır. Arka planda sürekli veya gizlice
+        ekran içeriğini okumaz; her kullanımda bildirim çubuğunda aktif olduğunu gösterir.
+    </string>
+</resources>
